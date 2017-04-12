@@ -172,10 +172,8 @@ controller.hears(['change my name'], ['direct_message', 'direct_mention', 'menti
     });
 });
 
-
-
 var bot = controller.spawn({
-    token: 'xoxb-166726071123-a6FEqEPwoCuVcO4aNNNvRb5u'
+    token: require('./config.json').token
 });
 
 bot.startRTM((err, bot, payload) => {
