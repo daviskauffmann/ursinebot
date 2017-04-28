@@ -4,7 +4,10 @@ var http = require('http');
 
 var controller = Botkit.slackbot();
 
-controller.hears(['bear', 'bears'], ['direct_message', 'direct_mention', 'mention', 'ambient'], (bot, message) => {
+const all = ['direct_message', 'direct_mention', 'mention', 'ambient'];
+const direct = ['direct_message', 'direct_mention', 'mention'];
+
+controller.hears(['bear', 'bears'], all, (bot, message) => {
     if (bot.identifyBot().id == message.user) {
         return;
     }
@@ -12,7 +15,7 @@ controller.hears(['bear', 'bears'], ['direct_message', 'direct_mention', 'mentio
     bot.reply(message, 'Grr!');
 });
 
-controller.hears(['hello', 'hi', 'hey'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
+controller.hears(['hello', 'hi', 'hey'], direct, (bot, message) => {
     bot.api.reactions.add({
         timestamp: message.ts,
         channel: message.channel,
@@ -32,11 +35,11 @@ controller.hears(['hello', 'hi', 'hey'], ['direct_message', 'direct_mention', 'm
     });
 });
 
-controller.hears(['zalgo'], ['direct_message', 'direct_mention', 'mention', 'ambient'], (bot, message) => {
+controller.hears(['zalgo'], all, (bot, message) => {
     bot.reply(message, 'G̦̜̝̦͍͝r͗͢rͦ̐ͫͥ͆̌̈́͏͍̳͚̣͍!̴̣ͭͭͪ');
 });
 
-controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your name'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
+controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your name'], direct, (bot, message) => {
     var uptime = process.uptime();
     var unit = 'second';
     if (uptime > 60) {
@@ -55,7 +58,7 @@ controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your na
     bot.reply(message, ':bear: Grr! (I am a bear named <@' + bot.identity.name + '>. I have been running for ' + uptime + ' on ' + os.hostname() + '.)');
 });
 
-controller.hears(['what is my name', 'who am i'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
+controller.hears(['what is my name', 'who am i'], direct, (bot, message) => {
     controller.storage.users.get(message.user, (err, user) => {
         if (user && user.name) {
             bot.reply(message, 'Grr! (Your name is ' + user.name + '!)');
@@ -114,7 +117,7 @@ controller.hears(['what is my name', 'who am i'], ['direct_message', 'direct_men
     });
 });
 
-controller.hears(['change my name'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
+controller.hears(['change my name'], direct, (bot, message) => {
     controller.storage.users.get(message.user, (err, user) => {
         if (user && user.name) {
             bot.startConversation(message, (err, convo) => {
