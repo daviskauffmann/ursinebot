@@ -1,49 +1,15 @@
 var Botkit = require('botkit');
 var os = require('os');
-var http = require('http');
+var request = require('request');
+var config = require('./config.json');
 
 var controller = Botkit.slackbot();
 
-const all = ['direct_message', 'direct_mention', 'mention', 'ambient'];
-const direct = ['direct_message', 'direct_mention', 'mention'];
-
-controller.hears(['favorite food'], all, (bot, message) => {
-    bot.reply(message, 'Grr! (Bear Meat!)');
-});
-
-controller.hears(['bear', 'bears'], all, (bot, message) => {
-    if (bot.identifyBot().id == message.user) {
-        return;
-    }
-
-    bot.reply(message, 'Grr!');
-});
-
-controller.hears(['hello', 'hi', 'hey'], direct, (bot, message) => {
-    bot.api.reactions.add({
-        timestamp: message.ts,
-        channel: message.channel,
-        name: 'bear',
-    }, function (err, res) {
-        if (err) {
-            bot.botkit.log('Failed to add emoji reaction :(', err);
-        }
-    });
-
-    controller.storage.users.get(message.user, function (err, user) {
-        if (user && user.name) {
-            bot.reply(message, 'Grr! (Hello ' + user.name + '!)');
-        } else {
-            bot.reply(message, 'Grr! (Hello!)');
-        }
-    });
-});
-
-controller.hears(['zalgo'], all, (bot, message) => {
+controller.hears(['zalgo'], config.channels.all, (bot, message) => {
     bot.reply(message, 'G̦̜̝̦͍͝r͗͢rͦ̐ͫͥ͆̌̈́͏͍̳͚̣͍!̴̣ͭͭͪ');
 });
 
-controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your name'], direct, (bot, message) => {
+controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your name'], config.channels.direct, (bot, message) => {
     var uptime = process.uptime();
     var unit = 'second';
     if (uptime > 60) {
@@ -62,7 +28,7 @@ controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your na
     bot.reply(message, ':bear: Grr! (I am a bear named <@' + bot.identity.name + '>. I have been running for ' + uptime + ' on ' + os.hostname() + '.)');
 });
 
-controller.hears(['what is my name', 'who am i'], direct, (bot, message) => {
+controller.hears(['what is my name', 'who am i'], config.channels.direct, (bot, message) => {
     controller.storage.users.get(message.user, (err, user) => {
         if (user && user.name) {
             bot.reply(message, 'Grr! (Your name is ' + user.name + '!)');
@@ -121,7 +87,7 @@ controller.hears(['what is my name', 'who am i'], direct, (bot, message) => {
     });
 });
 
-controller.hears(['change my name'], direct, (bot, message) => {
+controller.hears(['change my name'], config.channels.direct, (bot, message) => {
     controller.storage.users.get(message.user, (err, user) => {
         if (user && user.name) {
             bot.startConversation(message, (err, convo) => {
@@ -176,6 +142,18 @@ controller.hears(['change my name'], direct, (bot, message) => {
         } else {
             bot.reply('message', 'Grr! (I do not know your name!');
         }
+    });
+});
+
+controller.hears([''], config.channels.direct, (bot, message) => {
+    var say = message.text;
+    say = message.text.split('/').join('');
+    say = say.split(' ').join('%20');
+
+    request.get('http://api.program-o.com/v2/chatbot/?bot_id=' + config.bots.programO + '&say=' + say + '&convo_id=1&format=json', (error, response, body) => {
+        body = JSON.parse(body);
+
+        bot.reply(message, 'Grr! (' + body.botsay + ')');
     });
 });
 

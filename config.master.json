@@ -1,3 +1,13 @@
 {
-    "token": ""
+    "token": "",
+    "channels": {
+        "all": ["direct_message", "direct_mention", "mention", "ambient"],
+        "direct": ["direct_message", "direct_mention", "mention"]
+    },
+    "bots": {
+        "programO": 6,
+        "shakespeareBot": 10,
+        "chatmundo": 12,
+        "elizaibeth": 15
+    }
 }
