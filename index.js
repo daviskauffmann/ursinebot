@@ -7,6 +7,10 @@ var controller = Botkit.slackbot();
 const all = ['direct_message', 'direct_mention', 'mention', 'ambient'];
 const direct = ['direct_message', 'direct_mention', 'mention'];
 
+controller.hears(['favorite food'], all, (bot, message) => {
+    bot.reply(message, 'Grr! (Bear Meat!)');
+});
+
 controller.hears(['bear', 'bears'], all, (bot, message) => {
     if (bot.identifyBot().id == message.user) {
         return;
